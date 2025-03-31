@@ -69,6 +69,34 @@ public class LotacaoController {
         }
     }
 
+    @PostMapping("/paginado/servidores-efetivos-unidade")
+    public ResponseEntity<Page<LotacaoDTO>> findServidorEfetivoByUnidadeId(
+            @Parameter(description = "ID da Unidade que deseja verificar os Servidores Efetivos Lotados")
+            @Valid @RequestBody Long unidadeId,
+            @Parameter(description = "Parâmetros de paginação") Pageable pageable) {
+
+        try {
+            Page<LotacaoDTO> result = lotacaoService.findServidorEfetivoByUnidadeId(unidadeId, pageable);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/paginado/servidores-temporarios-unidade")
+    public ResponseEntity<Page<LotacaoDTO>> findServidorTemporarioByUnidadeId(
+            @Parameter(description = "ID da Unidade que deseja verificar os Servidores Temporarios Lotados")
+            @Valid @RequestBody Long unidadeId,
+            @Parameter(description = "Parâmetros de paginação") Pageable pageable) {
+
+        try {
+            Page<LotacaoDTO> result = lotacaoService.findServidorTemporarioByUnidadeId(unidadeId, pageable);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Operation(
             summary = "Lista todas as lotações",
             description = "Este endpoint retorna uma lista de todas as lotações cadastradas no sistema."

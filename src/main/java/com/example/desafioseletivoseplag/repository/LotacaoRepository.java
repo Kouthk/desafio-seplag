@@ -17,7 +17,15 @@ public interface LotacaoRepository  extends JpaRepository<Lotacao, Long> {
             "JOIN l.pessoa p " +
             "JOIN ServidorEfetivo se ON p.id = se.id " +
             "WHERE l.unidade.id = :unidadeId")
-    List<Lotacao> findServidorEfetivoByUnidadeId(Long unidadeId);
+    Page<Lotacao> findServidorEfetivoByUnidadeId(Long unidadeId, Pageable pageable);
+
+    @Query("SELECT l " +
+            "FROM Lotacao l " +
+            "JOIN l.pessoa p " +
+            "JOIN ServidorTemporario se ON p.id = se.id " +
+            "WHERE l.unidade.id = :unidadeId")
+    Page<Lotacao> findServidorTemporarioByUnidadeId(Long unidadeId, Pageable pageable);
+
 
     @Query("""
     SELECT l

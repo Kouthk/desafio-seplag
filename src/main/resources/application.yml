@@ -1,9 +1,15 @@
+application:
+  titulo: Seletivo Seplag - Desafio
+  autor: Alex Sandro Pereira Garcia
+  minio: Console minio - http://localhost:9001/
+  swagger: Endereco do Swagger - http://localhost:8080${SWAGGER_PATH:/doc/swagger.html}
+
 spring:
   application:
     name: desafio-seletivo-seplag
 
   datasource:
-    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432}/desafio-seletivo-seplag-db
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432}/desafio-seplag-db
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASS:postgres}
 
@@ -34,3 +40,4 @@ s3:
   bucket-name: ${STORAGE_BUCKET_NAME:desafio-seletivo-seplag-bucket}
   access-key: ${STORAGE_ACCESS_KEY:admin}
   secret-key: ${STORAGE_SECRET_KEY:admin}
+

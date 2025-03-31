@@ -39,6 +39,20 @@ public class LotacaoServiceImpl implements LotacaoService {
     }
 
     @Override
+    public Page<LotacaoDTO> findServidorEfetivoByUnidadeId(Long unidadeId, Pageable pageable) {
+        Page<Lotacao> lotacoes = repository.findServidorEfetivoByUnidadeId(unidadeId, pageable);
+
+        return lotacoes.map(LotacaoDTO::new);
+    }
+
+    @Override
+    public Page<LotacaoDTO> findServidorTemporarioByUnidadeId(Long unidadeId, Pageable pageable) {
+        Page<Lotacao> lotacoes = repository.findServidorTemporarioByUnidadeId(unidadeId, pageable);
+
+        return lotacoes.map(LotacaoDTO::new);
+    }
+
+    @Override
     @Transactional
     public LotacaoDTO create(LotacaoDTO lotacaoDTO) {
         validarCamposObrigatorios(lotacaoDTO);
