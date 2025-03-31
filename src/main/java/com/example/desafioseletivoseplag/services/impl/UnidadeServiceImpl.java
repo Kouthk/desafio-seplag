@@ -5,11 +5,9 @@ import com.example.desafioseletivoseplag.dtos.UnidadeDTO;
 import com.example.desafioseletivoseplag.dtos.filters.UnidadeFilterDTO;
 import com.example.desafioseletivoseplag.models.Endereco;
 import com.example.desafioseletivoseplag.models.Unidade;
-import com.example.desafioseletivoseplag.models.UnidadeEndereco;
 import com.example.desafioseletivoseplag.models.enums.LayerEnum;
 import com.example.desafioseletivoseplag.providers.exceptions.BusinessException;
 import com.example.desafioseletivoseplag.providers.exceptions.ResourceNotFoundException;
-import com.example.desafioseletivoseplag.repository.UnidadeEnderecoRepository;
 import com.example.desafioseletivoseplag.repository.UnidadeRepository;
 import com.example.desafioseletivoseplag.services.EnderecoService;
 import com.example.desafioseletivoseplag.services.UnidadeService;
@@ -28,12 +26,10 @@ public class UnidadeServiceImpl implements UnidadeService {
 
     private final UnidadeRepository repository;
     private final EnderecoService enderecoService;
-    private final UnidadeEnderecoRepository unidadeEnderecoRepository;
 
-    public UnidadeServiceImpl(UnidadeRepository repository, EnderecoService enderecoService, UnidadeEnderecoRepository unidadeEnderecoRepository) {
+    public UnidadeServiceImpl(UnidadeRepository repository, EnderecoService enderecoService) {
         this.repository = repository;
         this.enderecoService = enderecoService;
-        this.unidadeEnderecoRepository = unidadeEnderecoRepository;
     }
 
     @Override
@@ -48,21 +44,25 @@ public class UnidadeServiceImpl implements UnidadeService {
         validarCamposObrigatorios(unidadeDTO);
         Unidade unidade = unidadeDTO.toModel();
         unidade = repository.save(unidade);
-        Set<EnderecoDTO> enderecos = unidadeDTO.getEnderecos().stream().map(enderecoService::create).collect(Collectors.toSet());
-        for (EnderecoDTO endereco : enderecos) {
-            unidadeEnderecoRepository.save(new UnidadeEndereco(unidade.getId(), endereco.getId()));
-        }
+
+        // Cria e associa os endereços diretamente
+        Set<EnderecoDTO> enderecos = unidadeDTO.getEnderecos().stream()
+                .map(enderecoService::create)
+                .collect(Collectors.toSet());
+        unidade.setEnderecos(enderecos.stream().map(EnderecoDTO::toModel).collect(Collectors.toSet()));
+
         UnidadeDTO dto = new UnidadeDTO(unidade);
-        unidadeDTO.setEnderecos(enderecos);
         return dto;
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
-        List<UnidadeEndereco> unidadeEnderecos = unidadeEnderecoRepository.findByUnidadeId(id);
-        unidadeEnderecoRepository.deleteByUnidadeId(id);
-        unidadeEnderecos.forEach(unidadeEndereco -> enderecoService.delete(unidadeEndereco.getEnderecoId()));
+        Unidade unidade = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Nenhuma unidade encontrada", this));
+
+        // Excluir endereços associados
+        unidade.getEnderecos().forEach(endereco -> enderecoService.delete(endereco.getId()));
         repository.deleteById(id);
     }
 
@@ -73,9 +73,15 @@ public class UnidadeServiceImpl implements UnidadeService {
 
     @Override
     public UnidadeDTO findById(Long id) {
-        UnidadeDTO unidadeDTO = repository.findById(id).map(UnidadeDTO::new).orElseThrow(() -> new ResourceNotFoundException("Nenhuma unidade encontrada", this));
-        List<UnidadeEndereco> unidadeEnderecos = unidadeEnderecoRepository.findByUnidadeId(id);
-        unidadeDTO.setEnderecos(unidadeEnderecos.stream().map(unidadeEndereco -> enderecoService.findById(unidadeEndereco.getEnderecoId())).collect(Collectors.toSet()));
+        Unidade unidade = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Nenhuma unidade encontrada", this));
+        UnidadeDTO unidadeDTO = new UnidadeDTO(unidade);
+
+        // Associa os endereços corretamente
+        unidadeDTO.setEnderecos(unidade.getEnderecos().stream()
+                .map(endereco -> new EnderecoDTO(endereco))
+                .collect(Collectors.toSet()));
+
         return unidadeDTO;
     }
 
@@ -88,8 +94,11 @@ public class UnidadeServiceImpl implements UnidadeService {
         }
         Unidade unidade = unidadeDTO.toModel();
         unidade = repository.save(unidade);
+
+        // Atualizar endereços
+        unidadeDTO.setEnderecos(gerirRelacionamentoComEndereco(id, unidadeDTO.getEnderecos()));
+
         UnidadeDTO dto = new UnidadeDTO(unidade);
-        dto.setEnderecos(gerirRelacionamentoComEndereco(id, unidadeDTO.getEnderecos()));
         return dto;
     }
 
@@ -105,16 +114,13 @@ public class UnidadeServiceImpl implements UnidadeService {
 
     private Set<EnderecoDTO> gerirRelacionamentoComEndereco(long unidadeId, Set<EnderecoDTO> enderecos) {
         Set<EnderecoDTO> enderecosSalvos = new HashSet<>();
-        unidadeEnderecoRepository.deleteByUnidadeId(unidadeId);
-        EnderecoDTO enderecoDTO;
         for (EnderecoDTO endereco : enderecos) {
             if (endereco.getId() == null) {
-                enderecoDTO = enderecoService.create(endereco);
+                enderecoService.create(endereco);  // Cria e persiste novo endereço
             } else {
-                enderecoDTO = enderecoService.update(endereco, endereco.getId());
+                enderecoService.update(endereco, endereco.getId());  // Atualiza endereço existente
             }
-            unidadeEnderecoRepository.save(new UnidadeEndereco(unidadeId, enderecoDTO.getId()));
-            enderecosSalvos.add(enderecoDTO);
+            enderecosSalvos.add(endereco);
         }
         return enderecosSalvos;
     }
@@ -124,10 +130,10 @@ public class UnidadeServiceImpl implements UnidadeService {
             throw new BusinessException("O nome da unidade é obrigatório", this);
         }
         if (unidadeDTO.getSigla() == null || unidadeDTO.getSigla().isEmpty()) {
-            throw new BusinessException("A sigla da unidade é obrigatório", this);
+            throw new BusinessException("A sigla da unidade é obrigatória", this);
         }
         if (unidadeDTO.getEnderecos().isEmpty()) {
-            throw new BusinessException("Ao menos um endereco deve ser informado", this);
+            throw new BusinessException("Ao menos um endereço deve ser informado", this);
         }
     }
 }

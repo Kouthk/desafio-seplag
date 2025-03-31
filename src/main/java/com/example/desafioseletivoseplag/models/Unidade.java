@@ -2,6 +2,9 @@ package com.example.desafioseletivoseplag.models;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "unidade")
 public class Unidade {
@@ -10,10 +13,20 @@ public class Unidade {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "unid_id")
     private Long id;
+
     @Column(name = "unid_nome")
     private String nome;
+
     @Column(name = "unid_sigla")
     private String sigla;
+
+    @ManyToMany
+    @JoinTable(
+            name = "unidade_endereco",
+            joinColumns = @JoinColumn(name = "unid_id"),
+            inverseJoinColumns = @JoinColumn(name = "end_id")
+    )
+    private Set<Endereco> enderecos = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -39,4 +52,11 @@ public class Unidade {
         this.sigla = sigla;
     }
 
+    public Set<Endereco> getEnderecos() {
+        return enderecos;
+    }
+
+    public void setEnderecos(Set<Endereco> enderecos) {
+        this.enderecos = enderecos;
+    }
 }

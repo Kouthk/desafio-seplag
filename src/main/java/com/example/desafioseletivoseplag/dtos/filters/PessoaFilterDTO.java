@@ -1,8 +1,7 @@
 package com.example.desafioseletivoseplag.dtos.filters;
 
-public class PessoaFilter {
+public class PessoaFilterDTO {
     private String nome;
-    private LongDate
 
     public String getNome() {
         return nome;
@@ -10,6 +9,5 @@ public class PessoaFilter {
 
     public void setNome(String nome) {
         this.nome = nome;
-
     }
 }

@@ -23,7 +23,10 @@ public class LotacaoDTO implements ToModel<Lotacao> {
         this.dataLotacao = lotacao.getDataLotacao();
         this.dataRemocao = lotacao.getDataRemocao();
         this.portaria = lotacao.getPortaria();
+        this.pessoa = lotacao.getPessoa() != null ? new PessoaDTO(lotacao.getPessoa()) : null;
+        this.unidade = lotacao.getUnidade() != null ? new UnidadeDTO(lotacao.getUnidade()) : null;
     }
+
 
     public LotacaoDTO(Lotacao lotacao, Pessoa pessoa, Unidade unidade) {
         this(lotacao);

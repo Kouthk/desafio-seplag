@@ -35,6 +35,12 @@ public class CidadeServiceImpl implements CidadeService {
     }
 
     @Override
+    public Page<CidadeDTO> findByFilter(CidadeFilterDTO filter, Pageable pageable) {
+        Page<Cidade> cidades = repository.findByFilter(filter.getNome(), filter.getUf(), pageable);
+        return cidades.map(CidadeDTO::new);
+    }
+
+    @Override
     public String getClassName() {
         return this.getClass().getSimpleName();
     }
@@ -44,9 +50,5 @@ public class CidadeServiceImpl implements CidadeService {
         return LayerEnum.API_COMPONENT;
     }
 
-    @Override
-    public Page<CidadeDTO> findByFilter(CidadeFilterDTO filter, Pageable pageable) {
-        Page<Cidade> cidades = repository.findByFilter(filter.getNome(), filter.getUf(), pageable);
-        return cidades.map(CidadeDTO::new);
-    }
+
 }

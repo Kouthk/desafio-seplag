@@ -1,7 +1,6 @@
 package com.example.desafioseletivoseplag.models;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 
 @Entity
@@ -13,21 +12,21 @@ public class Lotacao {
     @Column(name = "lot_id")
     private Long id;
 
-    @Column(name = "lot_data_lotacao")
+    @Column(name = "lot_data_lotacao", nullable = false)
     private LocalDate dataLotacao;
 
     @Column(name = "lot_data_remocao")
     private LocalDate dataRemocao;
 
-    @Column(name = "lot_portaria")
+    @Column(name = "lot_portaria", length = 100)
     private String portaria;
 
-    @ManyToOne
-    @JoinColumn(name = "pes_id")
+    @OneToOne
+    @JoinColumn(name = "pes_id", unique = true, nullable = false)
     private Pessoa pessoa;
 
     @ManyToOne
-    @JoinColumn(name = "unid_id")
+    @JoinColumn(name = "unid_id", nullable = false)
     private Unidade unidade;
 
     public Long getId() {
@@ -77,5 +76,4 @@ public class Lotacao {
     public void setUnidade(Unidade unidade) {
         this.unidade = unidade;
     }
-
 }

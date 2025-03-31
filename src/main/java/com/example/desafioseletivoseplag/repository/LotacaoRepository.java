@@ -8,8 +8,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface LotacaoRepository  extends JpaRepository<Lotacao, Long> {
+
+    @Query("SELECT l " +
+            "FROM Lotacao l " +
+            "JOIN l.pessoa p " +
+            "JOIN ServidorEfetivo se ON p.id = se.id " +
+            "WHERE l.unidade.id = :unidadeId")
+    List<Lotacao> findServidorEfetivoByUnidadeId(Long unidadeId);
 
     @Query("""
     SELECT l

@@ -39,16 +39,6 @@ public class LotacaoServiceImpl implements LotacaoService {
     }
 
     @Override
-    public String getClassName() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
-    public LayerEnum getLayer() {
-        return LayerEnum.API_COMPONENT;
-    }
-
-    @Override
     @Transactional
     public LotacaoDTO create(LotacaoDTO lotacaoDTO) {
         validarCamposObrigatorios(lotacaoDTO);
@@ -59,15 +49,6 @@ public class LotacaoServiceImpl implements LotacaoService {
             lotacao.setDataRemocao(lotacaoDTO.getDataRemocao());
             lotacao.setUnidade(unidadeService.findById(lotacaoDTO.getUnidade().getId()).toModel());
             lotacao.setPessoa(pessoaService.findById(lotacaoDTO.getPessoa().getId()).toModel());
-
-            //Eaw, vai bota varias pessoas em  uma lotacao né? Ou vai ser uma por lotação?
-//            if (lotacaoDTO.getPessoas() != null && !lotacaoDTO.getPessoas().isEmpty()) {
-//                List<Pessoa> pessoas = lotacaoDTO.getPessoas().stream()
-//                        .map(pessoaDTO -> pessoaService.findById(pessoaDTO.getId()).toModel())
-//                        .collect(Collectors.toList());
-//                lotacao.setPessoas(pessoas);
-//            }
-
             Lotacao savedLotacao = repository.save(lotacao);
             return new LotacaoDTO(savedLotacao);
         } catch (DatabaseException e) {
@@ -120,6 +101,16 @@ public class LotacaoServiceImpl implements LotacaoService {
         } catch (DatabaseException e) {
             throw new DatabaseException("Erro ao tentar atualizar a Lotacao", this);
         }
+    }
+
+    @Override
+    public String getClassName() {
+        return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public LayerEnum getLayer() {
+        return LayerEnum.API_COMPONENT;
     }
 
     private void validarCamposObrigatorios(LotacaoDTO lotacaoDTO) {

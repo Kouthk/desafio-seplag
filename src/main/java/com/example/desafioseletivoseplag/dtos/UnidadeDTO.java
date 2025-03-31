@@ -3,13 +3,13 @@ package com.example.desafioseletivoseplag.dtos;
 import com.example.desafioseletivoseplag.models.Endereco;
 import com.example.desafioseletivoseplag.models.Unidade;
 import com.example.desafioseletivoseplag.providers.dtos.ToModel;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UnidadeDTO implements ToModel<Unidade> {
 
     private Long id;
@@ -20,14 +20,14 @@ public class UnidadeDTO implements ToModel<Unidade> {
     public UnidadeDTO() {}
 
     public UnidadeDTO(Unidade unidade) {
-        this.id = unidade.getId();
-        this.nome = unidade.getNome();
-        this.sigla = unidade.getSigla();
-    }
-
-    public UnidadeDTO(Unidade unidade, Set<Endereco> enderecos) {
-        this(unidade);
-        this.enderecos = enderecos == null || enderecos.isEmpty() ? null : enderecos.stream().map(EnderecoDTO::new).collect(Collectors.toSet());
+        if (unidade != null) {
+            this.id = unidade.getId();
+            this.nome = unidade.getNome();
+            this.sigla = unidade.getSigla();
+            this.enderecos = unidade.getEnderecos() != null
+                    ? unidade.getEnderecos().stream().map(EnderecoDTO::new).collect(Collectors.toSet())
+                    : new HashSet<>();
+        }
     }
 
     public Long getId() {
@@ -68,6 +68,9 @@ public class UnidadeDTO implements ToModel<Unidade> {
         unidade.setId(id);
         unidade.setNome(nome);
         unidade.setSigla(sigla);
+        if (enderecos != null) {
+            unidade.setEnderecos(enderecos.stream().map(EnderecoDTO::toModel).collect(Collectors.toSet()));
+        }
         return unidade;
     }
 }

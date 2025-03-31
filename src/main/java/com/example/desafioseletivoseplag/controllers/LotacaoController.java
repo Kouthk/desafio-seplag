@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,7 +24,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/v1/lotacoes")
-public class LotacaoController implements LayerDefinition {
+@Tag(name = "Lotação", description = "Gerenciamento de Lotações")
+public class LotacaoController {
 
     @Autowired
     private LotacaoService lotacaoService;
@@ -126,13 +128,4 @@ public class LotacaoController implements LayerDefinition {
         }
     }
 
-    @Override
-    public String getClassName() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
-    public LayerEnum getLayer() {
-        return LayerEnum.API_CONTROLLER;
-    }
 }

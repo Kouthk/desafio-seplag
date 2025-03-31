@@ -21,6 +21,7 @@ public class PessoaDTO implements ToModel<Pessoa> {
     private String nomePai;
     private String urlFoto;
     private List<EnderecoDTO> enderecos = new ArrayList<>();
+    private List<FotoDTO> fotos = new ArrayList<>();
 
     public PessoaDTO() {}
 
@@ -33,11 +34,20 @@ public class PessoaDTO implements ToModel<Pessoa> {
         this.nomePai = pessoa.getNomePai();
     }
 
-    public PessoaDTO(Pessoa pessoa, String urlFoto, List<Endereco> enderecos) {
+    public PessoaDTO(Pessoa pessoa, List<FotoPessoa> fotos, List<Endereco> enderecos) {
         this(pessoa);
-        this.urlFoto = urlFoto;
-        this.enderecos = enderecos == null || enderecos.isEmpty() ? null : enderecos.stream().map(EnderecoDTO::new).toList();
+        this.fotos = (fotos != null)
+                ? fotos.stream()
+                .filter(foto -> foto != null)  // Filtra fotos nulas
+                .map(FotoDTO::new)
+                .toList()
+                : new ArrayList<>();
+        this.enderecos = (enderecos != null && !enderecos.isEmpty())
+                ? enderecos.stream().map(EnderecoDTO::new).collect(Collectors.toList())
+                : new ArrayList<>();
     }
+
+
 
     public Long getId() {
         return id;
@@ -103,6 +113,14 @@ public class PessoaDTO implements ToModel<Pessoa> {
         this.enderecos = enderecos;
     }
 
+    public List<FotoDTO> getFotos() {
+        return fotos;
+    }
+
+    public void setFotos(List<FotoDTO> fotos) {
+        this.fotos = fotos;
+    }
+
     @Override
     public Pessoa toModel() {
         Pessoa pessoa = new  Pessoa();
@@ -115,6 +133,11 @@ public class PessoaDTO implements ToModel<Pessoa> {
         if(enderecos != null && !enderecos.isEmpty()) {
             pessoa.setEnderecos(enderecos.stream().map(EnderecoDTO::toModel).collect(Collectors.toSet()));
         }
+        if(fotos != null && !fotos.isEmpty()) {
+            pessoa.setFotos(fotos.stream().map(FotoDTO::toModel).collect(Collectors.toSet()));
+        }
         return pessoa;
     }
+
+
 }

@@ -1,12 +1,34 @@
 package com.example.desafioseletivoseplag.dtos;
 
-public class FotoDTO {
+import com.example.desafioseletivoseplag.models.FotoPessoa;
+import com.example.desafioseletivoseplag.providers.dtos.ToModel;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+public class FotoDTO implements ToModel<FotoPessoa> {
 
     private Long id;
-    private String nomeArquivo;
-    private String extensaoArquivo;
-    private String contentType;
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime data;
+    private String bucket;
+    private String hash;
     private byte[] content;
+    private String filename;
+    private String contentType;
+    private String url;
+
+    public FotoDTO() {}
+
+    public FotoDTO(FotoPessoa foto) {
+        this.id = foto.getId();
+        this.data = foto.getData().atStartOfDay();
+        this.bucket = foto.getBucket();
+        this.url = foto.getUrl();
+    }
+
+
 
     public Long getId() {
         return id;
@@ -16,20 +38,52 @@ public class FotoDTO {
         this.id = id;
     }
 
-    public String getNomeArquivo() {
-        return nomeArquivo;
+    public LocalDateTime getData() {
+        return data;
     }
 
-    public void setNomeArquivo(String nomeArquivo) {
-        this.nomeArquivo = nomeArquivo;
+    public void setData(LocalDateTime data) {
+        this.data = data;
     }
 
-    public String getExtensaoArquivo() {
-        return extensaoArquivo;
+    public String getUrl() {
+        return url;
     }
 
-    public void setExtensaoArquivo(String extensaoArquivo) {
-        this.extensaoArquivo = extensaoArquivo;
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getBucket() {
+        return bucket;
+    }
+
+    public void setBucket(String bucket) {
+        this.bucket = bucket;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
+
+    public void setContent(byte[] content) {
+        this.content = content;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
     public String getContentType() {
@@ -40,11 +94,13 @@ public class FotoDTO {
         this.contentType = contentType;
     }
 
-    public byte[] getContent() {
-        return content;
+    @Override
+    public FotoPessoa toModel() {
+        FotoPessoa model = new FotoPessoa();
+        model.setId(id);
+        model.setData(LocalDate.from(data));
+        model.setBucket(bucket);
+        return model;
     }
 
-    public void setContent(byte[] content) {
-        this.content = content;
-    }
 }

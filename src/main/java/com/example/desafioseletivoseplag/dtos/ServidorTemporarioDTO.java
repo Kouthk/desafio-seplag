@@ -21,7 +21,7 @@ public class ServidorTemporarioDTO implements ToModel<ServidorTemporario> {
 
     public ServidorTemporarioDTO(ServidorTemporario servidorTemporario, Pessoa pessoa) {
         this(servidorTemporario);
-        this.pessoa = pessoa == null ? null : new PessoaDTO(pessoa);
+        this.pessoa = pessoa == null ? null : new  PessoaDTO(pessoa, pessoa.getFotos().stream().toList(),pessoa.getEnderecos().stream().toList());
     }
 
     public LocalDate getDataAdmissao() {
@@ -55,7 +55,6 @@ public class ServidorTemporarioDTO implements ToModel<ServidorTemporario> {
         servidorTemporario.setDataDemissao(dataDemissao);
         if (pessoa != null) {
             servidorTemporario.setPessoa(pessoa.toModel());
-            servidorTemporario.setPessoaId(pessoa.getId());
         }
         return servidorTemporario;
     }

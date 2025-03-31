@@ -38,7 +38,7 @@ public class Pessoa {
     @OneToMany(mappedBy = "pessoa")
     private Set<FotoPessoa> fotos = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "pessoa_endereco",
             joinColumns = @JoinColumn(name = "pes_id"),
