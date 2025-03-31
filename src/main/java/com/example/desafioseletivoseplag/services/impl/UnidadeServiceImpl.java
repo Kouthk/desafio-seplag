@@ -40,6 +40,13 @@ public class UnidadeServiceImpl implements UnidadeService {
 
     @Override
     @Transactional
+    public Page<Unidade> findUnidadeComEnderecosByServidorNomeParte(String nome, Pageable pageable) {
+        return repository.findUnidadeComEnderecosByServidorNomeParte(nome, pageable);
+    }
+
+
+    @Override
+    @Transactional
     public UnidadeDTO create(UnidadeDTO unidadeDTO) {
         validarCamposObrigatorios(unidadeDTO);
         Unidade unidade = unidadeDTO.toModel();

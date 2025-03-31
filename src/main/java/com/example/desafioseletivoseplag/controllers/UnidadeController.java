@@ -36,6 +36,11 @@ public class UnidadeController {
         return service.findByFilter(filter, pageable);
     }
 
+    @PostMapping("/paginado/endereco-unidade-por-nome-servidor")
+    public Page<UnidadeDTO> findUnidadeComEnderecosByServidorNomeParte(@RequestBody String nomeServidor, Pageable pageable) {
+        return service.findUnidadeComEnderecosByServidorNomeParte(nomeServidor, pageable).map(UnidadeDTO::new);
+    }
+
     @Operation(summary = "Cria uma nova unidade")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Unidade criada com sucesso"),
